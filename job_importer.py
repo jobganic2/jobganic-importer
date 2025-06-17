@@ -18,8 +18,8 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 # Required fields (match Supabase schema)
 REQUIRED_FIELDS = ["id", "title", "company", "location", "description", "url", "date_posted", "source"]
 
-def fetch_jobs():
-    url = f"https://boards-api.greenhouse.io/v1/boards/{GREENHOUSE_BOARD_TOKEN}/jobs?content=true"
+def fetch_jobs(token):
+    url = f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true"
     resp = requests.get(url)
     resp.raise_for_status()
     return resp.json()["jobs"]
