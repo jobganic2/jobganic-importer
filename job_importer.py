@@ -11,8 +11,10 @@ COMPANIES = {
     "phxproduction": "The Honest Company"
 }
 
-SUPABASE_URL = "https://bkxjywujpqfqoeyvnmvj.supabase.co"
-SUPABASE_KEY = "YOUR_SUPABASE_KEY"  # DO NOT hardcode — use GitHub Secrets!
+import os
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 REQUIRED_FIELDS = ["id", "title", "company", "location", "description", "url", "date_posted", "source"]
 
