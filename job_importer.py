@@ -60,10 +60,5 @@ def main():
             for job in jobs:
                 job_payload = make_job_payload(job, company_name)
                 post_to_supabase(job_payload)
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
-                print(f"⚠️  Skipping {company_name} — No Greenhouse board found (404).")
-            else:
-                print(f"❌ Error fetching jobs for {company_name}: {e}")
         except Exception as e:
-            print(f"❌ Unexpected error with {company_name}: {e}")
+            print(f"❌ Error fetching jobs for {company_name} ({token}): {e}")
