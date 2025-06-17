@@ -55,12 +55,18 @@ def post_to_supabase(job_data):
 
 def main():
     for token, company_name in COMPANIES.items():
-        print(f"📡 Fetching jobs for {company_name} ({token})...")
-        jobs = fetch_jobs(token)
-        print(f"📦 Found {len(jobs)} jobs at {company_name}")
-        for job in jobs:
-            job_payload = make_job_payload(job, company_name)
-            post_to_supabase(job_payload)
+        try:
+            print(f"📡 Fetching jobs for {company_name} ({token})...")
+            jobs = fetch_jobs(token)
+            print(f"📦 Found {len(jobs)} jobs at {company_name}")
 
-if __name__ == "__main__":
-    main()
+            for job in jobs:
+                job_payload = make_job_payload(job, company_name)
+                post_to_supabase(job_payload)
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                print(f"⚠️  Skipping {company_name} — No Greenhouse board found (404).")
+            else:
+                print(f"❌ Error fetching jobs for {company_name}: {e}")
+        except Exception as e:
+            print(f"❌ Unexpected error with {company_name}: {e}")
