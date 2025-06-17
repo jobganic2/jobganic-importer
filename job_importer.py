@@ -8,7 +8,8 @@ print("🚀 Job Importer started...")
 COMPANIES = {
     "bark": "Bark",
     "vitalfarms": "Vital Farms",
-    "phxproduction": "The Honest Company"
+    "phxproduction": "The Honest Company",
+    "sweetgreen": "Sweetgreen"
 }
 
 import os
