@@ -1,0 +1,27 @@
+name: Import Greenhouse Jobs
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # runs daily at 3:00 AM UTC
+  workflow_dispatch:
+
+jobs:
+  run-job-importer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run job importer
+        run: python job_importer.py
+        env:
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
