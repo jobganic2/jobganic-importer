@@ -1,11 +1,12 @@
+import os
 import requests
 import hashlib
 import datetime
 
 # CONFIG — customize per company
 GREENHOUSE_BOARD_TOKEN = "bark"  # e.g., 'bark' in boards.greenhouse.io/bark
-SUPABASE_URL = "https://bkxjywujpqfqoeyvnmvj.supabase.co"
-SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY"
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 # Required fields (match Supabase schema)
 REQUIRED_FIELDS = ["id", "title", "company", "location", "description", "url", "date_posted", "source"]
