@@ -4,7 +4,15 @@ import hashlib
 import datetime
 
 # CONFIG — customize per company
-GREENHOUSE_BOARD_TOKEN = "bark"  # e.g., 'bark' in boards.greenhouse.io/bark
+COMPANIES = {
+    "bark": "Bark",
+    "patagonia": "Patagonia",
+    "vitalfarms": "Vital Farms",
+    "haincelestial": "Hain Celestial",
+    "organicvalley": "Organic Valley",
+    "seventhgeneration": "Seventh Generation"
+}
+
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
