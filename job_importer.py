@@ -4,11 +4,8 @@ import datetime
 # ✅ Greenhouse company tokens + display names
 COMPANIES = {
     "bark": "Bark",
-    "patagonia": "Patagonia",
     "vitalfarms": "Vital Farms",
-    "haincelestial": "Hain Celestial",
-    "organicvalley": "Organic Valley",
-    "seventhgeneration": "Seventh Generation"
+    "phxproduction": "The Honest Company"
 }
 
 SUPABASE_URL = "https://bkxjywujpqfqoeyvnmvj.supabase.co"
