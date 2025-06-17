@@ -1,9 +1,7 @@
-import os
 import requests
-import hashlib
 import datetime
 
-# CONFIG — customize per company
+# ✅ Greenhouse company tokens + display names
 COMPANIES = {
     "bark": "Bark",
     "patagonia": "Patagonia",
@@ -12,10 +10,10 @@ COMPANIES = {
     "organicvalley": "Organic Valley",
     "seventhgeneration": "Seventh Generation"
 }
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
-# Required fields (match Supabase schema)
+SUPABASE_URL = "https://bkxjywujpqfqoeyvnmvj.supabase.co"
+SUPABASE_KEY = "YOUR_SUPABASE_KEY"  # DO NOT hardcode — use GitHub Secrets!
+
 REQUIRED_FIELDS = ["id", "title", "company", "location", "description", "url", "date_posted", "source"]
 
 def fetch_jobs(token):
@@ -60,8 +58,9 @@ def main():
         print(f"📡 Fetching jobs for {company_name} ({token})...")
         jobs = fetch_jobs(token)
         print(f"📦 Found {len(jobs)} jobs at {company_name}")
-
         for job in jobs:
             job_payload = make_job_payload(job, company_name)
             post_to_supabase(job_payload)
-            
+
+if __name__ == "__main__":
+    main()
