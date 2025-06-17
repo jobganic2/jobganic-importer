@@ -27,16 +27,16 @@ def fetch_jobs(token):
 def clean_description(html):
     return html.replace("\n", " ").replace("\r", " ").strip()
 
-def make_job_payload(job):
+def make_job_payload(job, company_name):
     job_id = job["id"]
     return {
         "id": str(job_id),
         "title": job["title"],
-        "company": "Bark",
+        "company": company_name,
         "location": job["location"]["name"],
         "description": clean_description(job["content"]),
         "url": job["absolute_url"],
-        "date_posted": job["updated_at"][:10],  # Format: YYYY-MM-DD
+        "date_posted": job["updated_at"][:10],
         "source": "greenhouse",
         "department": job.get("department", {}).get("name"),
     }
