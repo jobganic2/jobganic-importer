@@ -12,7 +12,6 @@ COMPANIES = {
     "organicvalley": "Organic Valley",
     "seventhgeneration": "Seventh Generation"
 }
-
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
