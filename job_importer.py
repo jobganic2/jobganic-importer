@@ -57,12 +57,11 @@ def post_to_supabase(job_data):
         print(f"✅ Inserted job {job_data['id']}")
 
 def main():
-    jobs = fetch_jobs()
-    print(f"📦 Found {len(jobs)} jobs")
+    for token, company_name in COMPANIES.items():
+        print(f"📡 Fetching jobs for {company_name} ({token})...")
+        jobs = fetch_jobs(token)
+        print(f"📦 Found {len(jobs)} jobs at {company_name}")
 
-    for job in jobs:
-        job_payload = make_job_payload(job)
-        post_to_supabase(job_payload)
-
-if __name__ == "__main__":
-    main()
+        for job in jobs:
+            job_payload = make_job_payload(job, company_name)
+            post_to_supabase(job_payload)
