@@ -2,6 +2,9 @@ import requests
 import datetime
 
 # ✅ Greenhouse company tokens + display names
+
+print("🚀 Job Importer started...")
+
 COMPANIES = {
     "bark": "Bark",
     "vitalfarms": "Vital Farms",
@@ -62,3 +65,7 @@ def main():
                 post_to_supabase(job_payload)
         except Exception as e:
             print(f"❌ Error fetching jobs for {company_name} ({token}): {e}")
+            
+if __name__ == "__main__":
+    main()
+
