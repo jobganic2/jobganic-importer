@@ -64,3 +64,4 @@ def main():
         for job in jobs:
             job_payload = make_job_payload(job, company_name)
             post_to_supabase(job_payload)
+            
