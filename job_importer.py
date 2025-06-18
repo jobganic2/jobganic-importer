@@ -4,6 +4,7 @@ import os
 
 print("🚀 Job Importer started...")
 
+# ✅ Greenhouse company tokens + display names
 COMPANIES = {
     "bark": "Bark",
     "vitalfarms": "Vital Farms",
@@ -13,6 +14,8 @@ COMPANIES = {
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
+REQUIRED_FIELDS = ["id", "title", "company", "location", "description", "url", "date_posted", "source"]
 
 def fetch_jobs(token):
     url = f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true"
@@ -24,8 +27,9 @@ def clean_description(html):
     return html.replace("\n", " ").replace("\r", " ").strip()
 
 def make_job_payload(job, company_name):
+    job_id = job["id"]
     return {
-        "id": str(job["id"]),
+        "id": str(job_id),
         "title": job["title"],
         "company": company_name,
         "location": job["location"]["name"],
@@ -33,11 +37,11 @@ def make_job_payload(job, company_name):
         "url": job["absolute_url"],
         "date_posted": job["updated_at"][:10],
         "source": "greenhouse",
-        "department": job.get("departments", [{}])[0].get("name") if job.get("departments") else None,
-        "employment_type": job.get("metadata", [{}])[0].get("value") if "employment" in str(job.get("metadata", "")).lower() else None,
-        "job_type": job.get("metadata", [{}])[1].get("value") if "job" in str(job.get("metadata", "")).lower() else None,
-        "experience_level": next((item["value"] for item in job.get("metadata", []) if "experience" in item.get("name", "").lower()), None),
-        "industry": next((item["value"] for item in job.get("metadata", []) if "industry" in item.get("name", "").lower()), None),
+        "department": job.get("department", {}).get("name"),
+        "employment_type": job.get("metadata", [{}])[0].get("value") if job.get("metadata") else None,
+        "job_type": None,  # Update when Greenhouse offers this info
+        "experience_level": None,  # Update if you parse this from metadata
+        "industry": None  # Update if you define this per company
     }
 
 def post_to_supabase(job_data):
@@ -68,3 +72,4 @@ def main():
             print(f"❌ Error fetching jobs for {company_name} ({token}): {e}")
 
 if __name__ == "__main__":
+    main()
