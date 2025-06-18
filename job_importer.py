@@ -15,8 +15,6 @@ COMPANIES = {
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
-REQUIRED_FIELDS = ["id", "title", "company", "location", "description", "url", "date_posted", "source"]
-
 def fetch_jobs(token):
     url = f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true"
     resp = requests.get(url)
@@ -26,8 +24,17 @@ def fetch_jobs(token):
 def clean_description(html):
     return html.replace("\n", " ").replace("\r", " ").strip()
 
+# ✅ Extract specific metadata value by field name
+def extract_metadata_value(metadata_list, key):
+    for field in metadata_list:
+        if field.get("name", "").lower() == key.lower():
+            return field.get("value")
+    return None
+
 def make_job_payload(job, company_name):
     job_id = job["id"]
+    metadata = job.get("metadata", [])
+
     return {
         "id": str(job_id),
         "title": job["title"],
@@ -38,10 +45,10 @@ def make_job_payload(job, company_name):
         "date_posted": job["updated_at"][:10],
         "source": "greenhouse",
         "department": job.get("department", {}).get("name"),
-        "employment_type": job.get("metadata", [{}])[0].get("value") if job.get("metadata") else None,
-        "job_type": None,  # Update when Greenhouse offers this info
-        "experience_level": None,  # Update if you parse this from metadata
-        "industry": None  # Update if you define this per company
+        "employment_type": extract_metadata_value(metadata, "Employment Type"),
+        "job_type": extract_metadata_value(metadata, "Job Type"),
+        "experience_level": extract_metadata_value(metadata, "Experience Level"),
+        "industry": extract_metadata_value(metadata, "Industry"),
     }
 
 def post_to_supabase(job_data):
