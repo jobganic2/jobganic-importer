@@ -1,4 +1,3 @@
-
 import requests
 import datetime
 import os
@@ -16,8 +15,6 @@ COMPANIES = {
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
-REQUIRED_FIELDS = ["id", "title", "company", "location", "description", "url", "date_posted", "source"]
-
 def fetch_jobs(token):
     url = f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true"
     resp = requests.get(url)
@@ -27,32 +24,30 @@ def fetch_jobs(token):
 def clean_description(html):
     return html.replace("\n", " ").replace("\r", " ").strip()
 
-def extract_metadata(metadata_list, key):
-    if isinstance(metadata_list, list):
-        for item in metadata_list:
-            if item.get("name") == key:
-                return item.get("value")
-    return None
-
 def make_job_payload(job, company_name):
     job_id = job["id"]
-    location = job.get("location", {}).get("name", "")
     metadata = job.get("metadata", [])
+
+    def get_meta_value(label):
+        for item in metadata:
+            if item.get("name", "").lower() == label.lower():
+                return item.get("value")
+        return None
 
     return {
         "id": str(job_id),
         "title": job["title"],
         "company": company_name,
-        "location": location,
+        "location": job["location"]["name"],
         "description": clean_description(job["content"]),
         "url": job["absolute_url"],
         "date_posted": job["updated_at"][:10],
         "source": "greenhouse",
         "department": job.get("department", {}).get("name"),
-        "employment_type": extract_metadata(metadata, "Employment Type"),
-        "job_type": extract_metadata(metadata, "Job Type"),
-        "experience_level": extract_metadata(metadata, "Experience Level"),
-        "industry": extract_metadata(metadata, "Industry"),
+        "employment_type": get_meta_value("Employment Type"),
+        "job_type": get_meta_value("Job Type"),
+        "experience_level": get_meta_value("Experience Level"),
+        "industry": get_meta_value("Industry")
     }
 
 def post_to_supabase(job_data):
