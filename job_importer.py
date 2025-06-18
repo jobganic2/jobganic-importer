@@ -26,7 +26,7 @@ def clean_description(html):
 
 def make_job_payload(job, company_name):
     job_id = job["id"]
-    metadata = job.get("metadata", [])
+    metadata = job.get("metadata") or []  # ✅ Safe fallback
 
     def get_meta_value(label):
         for item in metadata:
