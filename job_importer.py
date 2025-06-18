@@ -1,3 +1,4 @@
+
 import requests
 import datetime
 import os
@@ -21,21 +22,23 @@ def fetch_jobs(token):
     url = f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs?content=true"
     resp = requests.get(url)
     resp.raise_for_status()
-    
-    data = resp.json()
-    if "jobs" in data and isinstance(data["jobs"], list):
-        return data["jobs"]
-    else:
-        print(f"⚠️ No jobs found or unexpected response for token: {token}")
-        return []
+    return resp.json()["jobs"]
 
 def clean_description(html):
     return html.replace("\n", " ").replace("\r", " ").strip()
 
+def extract_metadata(metadata_list, key):
+    if isinstance(metadata_list, list):
+        for item in metadata_list:
+            if item.get("name") == key:
+                return item.get("value")
+    return None
+
 def make_job_payload(job, company_name):
     job_id = job["id"]
     location = job.get("location", {}).get("name", "")
-    
+    metadata = job.get("metadata", [])
+
     return {
         "id": str(job_id),
         "title": job["title"],
@@ -46,10 +49,10 @@ def make_job_payload(job, company_name):
         "date_posted": job["updated_at"][:10],
         "source": "greenhouse",
         "department": job.get("department", {}).get("name"),
-        "employment_type": job.get("metadata", {}).get("Employment Type"),
-        "job_type": job.get("metadata", {}).get("Job Type"),
-        "experience_level": job.get("metadata", {}).get("Experience Level"),
-        "industry": job.get("metadata", {}).get("Industry"),
+        "employment_type": extract_metadata(metadata, "Employment Type"),
+        "job_type": extract_metadata(metadata, "Job Type"),
+        "experience_level": extract_metadata(metadata, "Experience Level"),
+        "industry": extract_metadata(metadata, "Industry"),
     }
 
 def post_to_supabase(job_data):
@@ -78,6 +81,6 @@ def main():
                 post_to_supabase(job_payload)
         except Exception as e:
             print(f"❌ Error fetching jobs for {company_name} ({token}): {e}")
-            
+
 if __name__ == "__main__":
     main()
