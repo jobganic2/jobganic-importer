@@ -4,7 +4,6 @@ import os
 
 print("🚀 Job Importer started...")
 
-# ✅ Greenhouse company tokens + display names
 COMPANIES = {
     "bark": "Bark",
     "vitalfarms": "Vital Farms",
@@ -24,30 +23,59 @@ def fetch_jobs(token):
 def clean_description(html):
     return html.replace("\n", " ").replace("\r", " ").strip()
 
+# Inference helpers
+def normalize_employment_type(text):
+    text = text.lower()
+    if "remote" in text:
+        return "Remote"
+    if "hybrid" in text:
+        return "Hybrid"
+    if "on-site" in text or "onsite" in text:
+        return "On-site"
+    return None
+
+def normalize_job_type(text):
+    text = text.lower()
+    if "intern" in text:
+        return "Internship"
+    if "part-time" in text or "part time" in text:
+        return "Part-Time"
+    if "full-time" in text or "full time" in text:
+        return "Full-Time"
+    return None
+
+def normalize_experience_level(text):
+    text = text.lower()
+    if "entry" in text or "junior" in text:
+        return "Entry"
+    if "mid" in text or "intermediate" in text:
+        return "Mid"
+    if "senior" in text or "lead" in text:
+        return "Senior"
+    return None
+
 def make_job_payload(job, company_name):
     job_id = job["id"]
-    metadata = job.get("metadata") or []  # ✅ Safe fallback
+    title = job.get("title", "")
+    content = job.get("content", "")
 
-    def get_meta_value(label):
-        for item in metadata:
-            if item.get("name", "").lower() == label.lower():
-                return item.get("value")
-        return None
+    employment_type = job.get("employment_type") or normalize_employment_type(f"{title} {content}")
+    job_type = job.get("job_type") or normalize_job_type(f"{title} {content}")
+    experience_level = job.get("experience_level") or normalize_experience_level(f"{title} {content}")
 
     return {
         "id": str(job_id),
-        "title": job["title"],
+        "title": title,
         "company": company_name,
         "location": job["location"]["name"],
-        "description": clean_description(job["content"]),
+        "description": clean_description(content),
         "url": job["absolute_url"],
         "date_posted": job["updated_at"][:10],
         "source": "greenhouse",
         "department": job.get("department", {}).get("name"),
-        "employment_type": get_meta_value("Employment Type"),
-        "job_type": get_meta_value("Job Type"),
-        "experience_level": get_meta_value("Experience Level"),
-        "industry": get_meta_value("Industry")
+        "employment_type": employment_type,
+        "job_type": job_type,
+        "experience_level": experience_level
     }
 
 def post_to_supabase(job_data):
